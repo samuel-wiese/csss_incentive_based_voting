@@ -1,6 +1,6 @@
 import numpy as np
-import os
 import csv
+import os
 
 from house_representative import HouseRepresentative
 from party import Party

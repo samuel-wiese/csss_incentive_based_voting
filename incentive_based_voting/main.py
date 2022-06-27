@@ -1,8 +1,13 @@
+from congress import Congress
 from timeline import create_timeline
 
 
 # Settings
+year = 2010  # the current (start) year
 t_max = 120  # the total number of time steps in months
+
+# Initialise the Congress
+congress = Congress(year, t_max)
 
 # Create a timeline and run
 timeline = create_timeline(t_max)
@@ -13,7 +18,7 @@ for monthly_events in timeline:
 	for event in monthly_events:
 
 
-
+		pass
 
 
 
