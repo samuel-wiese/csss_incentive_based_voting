@@ -21,11 +21,11 @@ def create_timeline(t_max: int) -> List[List[Event]]:
 	timeline = []
 	for month in range(t_max):
 
-		# New legislature comes every month
+		# New bills are introduced every month
 		events = [Event.NEW_LEGISLATURE]
 
-		# New poll results come every 6 months
-		if month % 6 == 0:
+		# New poll results come every 3 months
+		if month % 3 == 0:
 			events.append(Event.NEW_POLLS)
 
 		# New opinion formation happens every month

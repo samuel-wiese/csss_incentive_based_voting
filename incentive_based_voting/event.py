@@ -3,7 +3,7 @@ from enum import Enum
 
 class Event(Enum):
 	"""
-	Events that may happen each year.
+	Events that may happen in a month.
 	"""
 
 	NEW_LEGISLATURE: 1

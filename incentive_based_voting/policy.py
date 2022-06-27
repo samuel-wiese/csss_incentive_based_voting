@@ -58,3 +58,25 @@ def pick_policy_preference_at_random(party: Party) -> Policy:
 		progressive = np.random.random()
 
 	return Policy(libertarian, progressive)
+
+
+def compute_distance(p1: Policy, p2: Policy) -> float:
+	"""
+	Computes the (Euclidean) distance between two policies.
+
+	TODO: Again, somewhat arbitrary.
+
+	Parameters
+	----------
+	p1 : Policy
+		The first policy.
+	p2 : Policy
+		The second policy.
+
+	Returns
+	-------
+	distance : float
+		The (Euclidean) distance between two policies.
+	"""
+
+	return np.sqrt((p1.libertarian - p2.libertarian) ** 2 + (p1.progressive - p2.progressive) ** 2)

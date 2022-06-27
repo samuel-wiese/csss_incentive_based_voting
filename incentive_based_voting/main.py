@@ -1,78 +1,63 @@
 from congress import Congress
 from timeline import create_timeline
+from event import Event
+from coalition import coalition_formation
+from president import President
 
 
 # Settings
 year = 2010  # the current (start) year
 t_max = 120  # the total number of time steps in months
+n_bills = 500  # the number of bills that are brought before congress each month
+
+# Data
+
 
 # Initialise the Congress
 congress = Congress(year, t_max)
 
 # Create a timeline and run
 timeline = create_timeline(t_max)
-for monthly_events in timeline:
-
-	# TODO: do something
-
+for t, monthly_events in enumerate(timeline):
 	for event in monthly_events:
 
+		# New bills are being voted on every month
+		# TODO: this depends on the incentives
+		if event == Event.NEW_LEGISLATURE:
 
-		pass
+			# Create a few new bills and try to pass them
+			congress.generate_some_bills(n_bills, t)
+			congress.attempt_passing_bills(t)
+
+			# The president makes the final decision
 
 
 
 
-# TODO: leave this up; need it for opinion formation
+		# New poll results come out every 3 months
+		if event == Event.NEW_POLLS:
 
-# Initialise the representatives
-representatives = Representative.initialise_representatives(t_max)
+			# TODO: either use data or do scenario generation
 
-# Go
-for t in range(t_max):
+			pass
 
-	# Every voter and every coalition looks for the closest voter or coalition
-	closest_agents = []
-	for agent in agents:
-		closest_agent = agent.find_closest_agent(agents)
-		closest_agents.append(closest_agent)
+		# New coalition formation occurs every month
+		if event == Event.OPINION_FORMATION:
+			coalition_formation(congress.house.representatives, congress.house.coalitions,
+								congress.house.broken_coalitions, t, t_max)
+			coalition_formation(congress.senate.representatives, congress.senate.coalitions,
+								congress.senate.broken_coalitions, t, t_max)
 
-	# Look for matches for all of them
-	new_coalitions = []
-	new_matched_agents = []
-	for i, agent in enumerate(agents):
+		# Elections in the House happen every 2 years
+		if event == Event.HOUSE_ELECTION:
+			# TODO: nice for scenario generation, but ignore for now
+			pass
 
-		# Check for matches
-		agent_matched = None
-		for j, agent_ in enumerate(agents):
-			if closest_agents[i].id == agent_.id and closest_agents[j].id == agent.id and i < j:
-				agent_matched = agent_
-				break
-		if agent_matched is None:
-			continue
+		# Elections in the Senate happen every 6 years
+		if event == Event.SENATE_ELECTION:
+			# TODO: nice for scenario generation, but ignore for now
+			pass
 
-		# Match found, create a new coalition and remove the used ones
-		new_coalition = Coalition("(" + agent.id + "|" + agent_matched.id + ")", created_from_=[agent, agent_matched])
-		new_coalitions.append(new_coalition)
-		new_matched_agents.append([agent, agent_matched])
 
-	# Add new coalitions and remove matched agents from the active list of agents
-	agents.extend(new_coalitions)
-	for agent, agent_ in new_matched_agents:
-		agents.remove(agent)
-		agents.remove(agent_)
-
-	# Check if a coalition has a simple majority
-	for agent in agents:
-		if agent.type == "coalition" and agent.check_for_formation_stop(n_voters):
-			agents.remove(agent)
-
-	# Update the network
-	update_network(graph, new_coalitions, new_matched_agents, t)
-
-	# If there are fewer than two agents left, quit
-	if len(agents) < 2:
-		break
-
-# Draw our graph
-draw_network(graph)
+# TODO: Add a framework for network plotting in 2D
+# TODO: Add a framework for Congress election results
