@@ -1,6 +1,7 @@
 from voting_body import VotingBody
 from bill import Bill
 from vote import Vote
+from party import Party
 
 
 class Senate(VotingBody):
@@ -22,7 +23,7 @@ class Senate(VotingBody):
 
 		super().__init__(year, t_max, "senate")
 
-	def vote(self, bill: Bill, t: int) -> Vote:
+	def vote(self, bill: Bill, democrats: Party, republicans: Party, otherparty: Party, t: int) -> Vote:
 		"""
 		The Senate makes a decision on a bill.
 
@@ -30,6 +31,12 @@ class Senate(VotingBody):
 		----------
 		bill : Bill
 			The bill in question.
+		democrats : Party
+			The democratic party.
+		republicans : Party
+			The republican party.
+		otherparty : Party
+			The other party.
 		t : int
 			The current time step.
 
@@ -39,4 +46,4 @@ class Senate(VotingBody):
 			The resulting vote.
 		"""
 
-		return super().vote(bill, t)
+		return super().vote(bill, democrats, republicans, otherparty, t)

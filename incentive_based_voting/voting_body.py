@@ -6,8 +6,10 @@ from coalition import Coalition
 from house_representative import HouseRepresentative
 from senate_representative import SenateRepresentative
 from party import Party
+from parties import Parties
 from bill import Bill
 from vote import Vote
+from voting_bodies import VotingBodies
 
 from typing import List
 
@@ -17,9 +19,7 @@ class VotingBody:
 	A voting body in the US congress.
 	"""
 
-	# TODO: Keen to add an enum here.
-
-	def __init__(self, year: int, t_max: int, body: str):
+	def __init__(self, year: int, t_max: int, voting_body: VotingBodies):
 		"""
 		Initialises the voting body.
 
@@ -29,31 +29,31 @@ class VotingBody:
 			The current year.
 		t_max : int
 			The number of years we are running the simulation for.
-		body : str
+		voting_body : VotingBodies
 			Which voting body we are initiating.
 		"""
 
 		# Base parameters
 		self.year: int = year
 		self.t_max: int = t_max
-		self.body: str = body
+		self.voting_body: VotingBodies = voting_body
 
 		# Votes by year
 		self.votes_by_year: List[List[Vote]] = []
 
 		# Representatives and coalitions
-		if self.body == "house":
+		if self.voting_body == VotingBodies.HOUSE:
 			self.representatives: List[HouseRepresentative] = []
-		elif self.body == "senate":
-			self.representatives: List[SenateRepresentative] = []
+			desc = "house"
 		else:
-			assert 0
+			self.representatives: List[SenateRepresentative] = []
+			desc = "senate"
 		self.coalitions: List[Coalition] = []
 		self.broken_coalitions: List[Coalition] = []
 
 		# Take data and create new representatives
 		senate_data = []
-		f = open(os.path.dirname(__file__) + "/data/" + self.body + ".csv", "r")
+		f = open(os.path.dirname(__file__) + "/data/" + desc + ".csv", "r")
 		for line in csv.reader(f, quotechar='"', delimiter=',', quoting=csv.QUOTE_ALL, skipinitialspace=True):
 			senate_data.append(line)
 		senate_data = np.array(senate_data)
@@ -62,38 +62,34 @@ class VotingBody:
 		for rep_id, line in enumerate(senate_data[start_line:end_line + 1]):
 
 			# Take data
-			if self.body == "house":
+			if self.voting_body == VotingBodies.HOUSE:
 				state = line[2]
 				district = line[7]
 				name = line[11]
 				party_data = line[12]
-			elif self.body == "senate":
+			else:
 				state = line[2]
 				district = None
 				name = line[10]
 				party_data = line[11]
-			else:
-				assert 0
 
 			# Choose the party
 			if party_data == "DEMOCRAT":
-				party = Party.DEMOCRAT
+				party = Parties.DEMOCRATIC
 			elif party_data == "REPUBLICAN":
-				party = Party.REPUBLICAN
+				party = Parties.REPUBLICAN
 			else:
-				party = Party.OTHER
+				party = Parties.OTHER
 
 			# Create the representative
-			if self.body == "house":
+			if self.voting_body == VotingBodies.HOUSE:
 				representative = HouseRepresentative("HR_0_" + str(rep_id + 1), state, district, name, party, 0,
 													 self.t_max)
-			elif self.body == "senate":
-				representative = SenateRepresentative("SR_0_" + str(rep_id + 1), state, name, party, 0, self.t_max)
 			else:
-				assert 0
+				representative = SenateRepresentative("SR_0_" + str(rep_id + 1), state, name, party, 0, self.t_max)
 			self.representatives.append(representative)
 
-	def vote(self, bill: Bill, t: int) -> Vote:
+	def vote(self, bill: Bill, democrats: Party, republicans: Party, otherparty: Party, t: int) -> Vote:
 		"""
 		The voting body makes a decision on a bill.
 
@@ -101,6 +97,12 @@ class VotingBody:
 		----------
 		bill : Bill
 			The bill in question.
+		democrats : Party
+			The democratic party.
+		republicans : Party
+			The republican party.
+		otherparty : Party
+			The other party.
 		t : int
 			The current time step.
 
@@ -115,19 +117,19 @@ class VotingBody:
 
 		# Have all coalitions vote
 		for coalition in self.coalitions:
-			coalition_ids = [r.rep_id for r in coalition.representatives]
-			if bill.policy_range.in_range(coalition.policy_preference_t[t]):
-				yeas.extend(coalition_ids)
+			rep_ids = [r.id for r in coalition.representatives]
+			if coalition.vote(bill, democrats, republicans, otherparty):
+				yeas.extend(rep_ids)
 			else:
-				nays.extend(coalition_ids)
+				nays.extend(rep_ids)
 
 		# Have all other representatives vote
 		for representative in self.representatives:
 			if representative.coalition is None:
-				if bill.policy_range.in_range(representative.policy_preference_t[t]):
-					yeas.append(representative.rep_id)
+				if representative.vote(bill, democrats, republicans, otherparty):
+					yeas.append(representative.id)
 				else:
-					nays.append(representative.rep_id)
+					nays.append(representative.id)
 
 		# Return the results
-		return Vote(self.body, yeas, nays, t)
+		return Vote(self.voting_body, yeas, nays, t)

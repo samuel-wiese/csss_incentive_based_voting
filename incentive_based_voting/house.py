@@ -1,6 +1,8 @@
 from voting_body import VotingBody
 from bill import Bill
 from vote import Vote
+from party import Party
+from voting_bodies import VotingBodies
 
 
 class House(VotingBody):
@@ -20,9 +22,9 @@ class House(VotingBody):
 			The number of years we are running the simulation for.
 		"""
 
-		super().__init__(year, t_max, "house")
+		super().__init__(year, t_max, VotingBodies.HOUSE)
 
-	def vote(self, bill: Bill, t: int) -> Vote:
+	def vote(self, bill: Bill, democrats: Party, republicans: Party, otherparty: Party, t: int) -> Vote:
 		"""
 		The House makes a decision on a bill.
 
@@ -30,6 +32,12 @@ class House(VotingBody):
 		----------
 		bill : Bill
 			The bill in question.
+		democrats : Party
+			The democratic party.
+		republicans : Party
+			The republican party.
+		otherparty : Party
+			The other party.
 		t : int
 			The current time step.
 
@@ -39,4 +47,4 @@ class House(VotingBody):
 			The resulting vote.
 		"""
 
-		return super().vote(bill, t)
+		return super().vote(bill, democrats, republicans, otherparty, t)

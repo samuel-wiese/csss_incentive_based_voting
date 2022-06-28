@@ -1,27 +1,29 @@
-from __future__ import annotations
-
 import numpy as np
 
-from party import Party
+from congress_voter import CongressVoter
+from parties import Parties
 from coalition import Coalition
-from policy import Policy, pick_policy_preference_at_random
-from incentive import pick_incentive_at_random
+from policy import Policy
+from incentive import Incentive
+from bill import Bill
+from party import Party
+from voting_bodies import VotingBodies
 
-from typing import List, Optional
+from typing import Optional
 
 
-class Representative:
+class Representative(CongressVoter):
 	"""
 	A US Congress representative.
 	"""
 
-	def __init__(self, rep_id: str, state: str, name: str, party: Party, t: int, t_max: int):
+	def __init__(self, id_: str, state: str, name: str, party: Parties, voting_body: VotingBodies, t: int, t_max: int):
 		"""
 		Initialises our representative.
 
 		Parameters
 		----------
-		rep_id : str
+		id_ : str
 			The ID of the representative.
 		state : str
 			The corresponding state.
@@ -29,6 +31,8 @@ class Representative:
 			The name of the representative.
 		party : Party
 			The party of the representative.
+		voting_body : VotingBodies
+			The corresponding voting body.
 		t : int
 			The current time step.
 		t_max : int
@@ -36,25 +40,44 @@ class Representative:
 		"""
 
 		# Basic parameters
-		self.rep_id: str = rep_id
+		super().__init__(id_, party, voting_body, t, t_max)
 		self.state: str = state
 		self.name: str = name
-		self.party: Party = party
-		self.t_joined_congress: int = t
 
 		# Set the initial policy preference
-		self.policy_preference_t: List[Policy] = []
-		self.policy_preference_t[0] = pick_policy_preference_at_random(self.party)
+		self.policy_preference = Policy.pick_policy_preference_at_random(self.party)
 
 		# Set the initial importance of the representative in terms of party pressure
-		self.party_importance_t: np.ndarray = np.zeros(t_max)
 		self.party_importance_t[0] = Representative.get_initial_party_importance()
 
-		# Set the incentive
-		self.incentive = pick_incentive_at_random(self.party)
+		# Set the incentive at random
+		self.incentive = Incentive.pick_incentive_at_random(self.party)
 
 		# The corresponding coalition
 		self.coalition: Optional[Coalition] = None
+
+	def vote(self, bill: Bill, democrats: Party, republicans: Party, otherparty: Party) -> bool:
+		"""
+		The representative votes on a bill.
+
+		Parameters
+		----------
+		bill : Bill
+			The bill.
+		democrats : Party
+			The democratic party.
+		republicans : Party
+			The republican party.
+		otherparty : Party
+			The other party.
+
+		Returns
+		-------
+		decision : bool
+			Whether the representative voted for or against the bill.
+		"""
+
+		return super().vote(bill, democrats, republicans, otherparty)
 
 	@staticmethod
 	def get_initial_party_importance() -> float:

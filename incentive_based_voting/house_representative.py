@@ -1,5 +1,6 @@
 from representative import Representative
-from party import Party
+from parties import Parties
+from voting_bodies import VotingBodies
 
 
 class HouseRepresentative(Representative):
@@ -7,7 +8,7 @@ class HouseRepresentative(Representative):
 	A member of the US House of Representatives.
 	"""
 
-	def __init__(self, rep_id: str, state: str, district: str, name: str, party: Party, t: int, t_max: int):
+	def __init__(self, rep_id: str, state: str, district: str, name: str, party: Parties, t: int, t_max: int):
 		"""
 		Initialises our House representative.
 
@@ -21,7 +22,7 @@ class HouseRepresentative(Representative):
 			The corresponding district.
 		name : str
 			The name of the representative.
-		party : Party
+		party : Parties
 			The party of the representative.
 		t : int
 			The current time step.
@@ -29,5 +30,5 @@ class HouseRepresentative(Representative):
 			The number of years we are running the simulation for.
 		"""
 
-		super().__init__(rep_id, state, name, party, t, t_max)
+		super().__init__(rep_id, state, name, party, VotingBodies.HOUSE, t, t_max)
 		self.district = district

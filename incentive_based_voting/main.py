@@ -1,52 +1,62 @@
 from congress import Congress
-from timeline import create_timeline
+from timeline import Timeline
 from event import Event
-from coalition import coalition_formation
+from coalition import Coalition
 from president import President
+from party import Party
+from parties import Parties
+from voting_bodies import VotingBodies
 
 
 # Settings
-year = 2010  # the current (start) year
-t_max = 120  # the total number of time steps in months
+start_year = 2010
+end_year = 2020
 n_bills = 500  # the number of bills that are brought before congress each month
 
-# Data
-
+# Create a timeline
+timeline = Timeline(start_year, end_year)
 
 # Initialise the Congress
-congress = Congress(year, t_max)
+congress = Congress(start_year, timeline.t_max)
 
-# Create a timeline and run
-timeline = create_timeline(t_max)
-for t, monthly_events in enumerate(timeline):
-	for event in monthly_events:
+# Create our parties
+democrats = Party(Parties.DEMOCRATIC)
+republicans = Party(Parties.REPUBLICAN)
+otherparty = Party(Parties.OTHER)
+
+# Initialise the President
+president = President(Parties.DEMOCRATIC)
+
+# Run
+for t, time in enumerate(timeline.events):
+	for event in timeline.events[time]:
 
 		# New bills are being voted on every month
-		# TODO: this depends on the incentives
 		if event == Event.NEW_LEGISLATURE:
+
+			# Update party policy preferences
+			democrats.update_policy_preference(congress.house.representatives, congress.senate.representatives, t=0)
+			republicans.update_policy_preference(congress.house.representatives, congress.senate.representatives, t=0)
+			otherparty.update_policy_preference(congress.house.representatives, congress.senate.representatives, t=0)
 
 			# Create a few new bills and try to pass them
 			congress.generate_some_bills(n_bills, t)
-			congress.attempt_passing_bills(t)
+			congress.attempt_passing_bills(democrats, republicans, otherparty, t)
 
 			# The president makes the final decision
-
-
-
+			president.vote_for_bills(congress.bills_successful)
 
 		# New poll results come out every 3 months
 		if event == Event.NEW_POLLS:
-
 			# TODO: either use data or do scenario generation
-
 			pass
 
 		# New coalition formation occurs every month
 		if event == Event.OPINION_FORMATION:
-			coalition_formation(congress.house.representatives, congress.house.coalitions,
-								congress.house.broken_coalitions, t, t_max)
-			coalition_formation(congress.senate.representatives, congress.senate.coalitions,
-								congress.senate.broken_coalitions, t, t_max)
+			Coalition.coalition_formation(congress.house.representatives, congress.house.coalitions,
+										  congress.house.broken_coalitions, VotingBodies.HOUSE, t, timeline.t_max)
+			Coalition.coalition_formation(congress.senate.representatives, congress.senate.coalitions,
+										  congress.senate.broken_coalitions, VotingBodies.SENATE, t, timeline.t_max)
 
 		# Elections in the House happen every 2 years
 		if event == Event.HOUSE_ELECTION:
@@ -58,6 +68,9 @@ for t, monthly_events in enumerate(timeline):
 			# TODO: nice for scenario generation, but ignore for now
 			pass
 
+		# Presidential elections happen every 4 years
+		if event == Event.PRESIDENTIAL_ELECTION:
+			# TODO: nice for scenario generation, but ignore for now
+			pass
 
-# TODO: Add a framework for network plotting in 2D
-# TODO: Add a framework for Congress election results
+print("Done!")

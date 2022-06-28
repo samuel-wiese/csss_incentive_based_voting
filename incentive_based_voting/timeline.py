@@ -1,45 +1,55 @@
 from event import Event
+from time import Time
 
-from typing import List
+from typing import List, Dict
 
 
-def create_timeline(t_max: int) -> List[List[Event]]:
+class Timeline:
 	"""
-	Creates a list of events happening each month.
-
-	Parameters
-	----------
-	t_max : int
-		The number of time steps in months.
-
-	Returns
-	-------
-	timeline: List[Event]
-		The list of events for each year.
+	Represents the timeline of the model.
 	"""
 
-	timeline = []
-	for month in range(t_max):
+	def __init__(self, start_year: int, end_year: int):
+		"""
+		Initialises the timeline.
 
-		# New bills are introduced every month
-		events = [Event.NEW_LEGISLATURE]
+		Parameters
+		----------
+		start_year : int
+			The start year.
+		end_year : int
+			The end year.
+		"""
 
-		# New poll results come every 3 months
-		if month % 3 == 0:
-			events.append(Event.NEW_POLLS)
+		# Events happening at each time step
+		self.events: Dict[Time, List[Event]] = {}
+		time = Time(start_year)
+		end_time = Time(end_year, 12)
+		while time < end_time:
 
-		# New opinion formation happens every month
-		events.append(Event.OPINION_FORMATION)
+			# New bills are introduced every month
+			events: List[Event] = [Event.NEW_LEGISLATURE]
+	
+			# New poll results come every 3 months
+			if time.month % 3 == 0:
+				events.append(Event.NEW_POLLS)
+	
+			# New opinion formation happens every month
+			events.append(Event.OPINION_FORMATION)
+	
+			# House election happens every 2 years
+			if time.year % 2 == 0:
+				events.append(Event.HOUSE_ELECTION)
+	
+			# Senate election happens every 6 years
+			if time.year % 6 == 0:
+				events.append(Event.SENATE_ELECTION)
 
-		# House election happens every 2 years
-		if month % 24 == 0:
-			events.append(Event.HOUSE_ELECTION)
+			# Presidential election happens every 4 years
+			if time.year % 4 == 0:
+				events.append(Event.PRESIDENTIAL_ELECTION)
 
-		# Senate election happens every 6 years
-		# TODO: I am aware that not all states have senate elections at the same time, but let's go with that for now.
-		if month % 72 == 0:
-			events.append(Event.SENATE_ELECTION)
+			self.events[time] = events
 
-		timeline.append(events)
-
-	return timeline
+		# Total number of time steps
+		self.t_max = len(self.events.keys())

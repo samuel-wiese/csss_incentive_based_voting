@@ -1,3 +1,5 @@
+from voting_bodies import VotingBodies
+
 from typing import List
 
 
@@ -6,14 +8,14 @@ class Vote:
 	A single vote.
 	"""
 
-	def __init__(self, body: str, yeas: List[str], nays: List[str], t: int):
+	def __init__(self, voting_body: VotingBodies, yeas: List[str], nays: List[str], t: int):
 		"""
 		Initialises a new policy preference.
 
 		Parameters
 		----------
-		body : str
-			The voting body.
+		voting_body : VotingBodies
+			The corresponding voting body.
 		yeas : List[str]
 			The IDs of the representatives that voted for the bill.
 		nays : List[str]
@@ -23,7 +25,7 @@ class Vote:
 		"""
 
 		# Base parameters
-		self.body: str = body
+		self.voting_body: VotingBodies = voting_body
 		self.yeas: List[str] = yeas
 		self.nays: List[str] = nays
 		self.time_of_vote: int = t
@@ -41,9 +43,7 @@ class Vote:
 			Whether the vote has passed.
 		"""
 
-		if self.body == "house":
+		if self.voting_body == VotingBodies.HOUSE:
 			return len(self.yeas) >= 218
-		elif self.body == "senate":
-			return len(self.yeas) >= 51
 		else:
-			assert 0
+			return len(self.yeas) >= 51

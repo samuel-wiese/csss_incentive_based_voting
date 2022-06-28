@@ -55,29 +55,27 @@ class PolicyRange:
 		return (self.libertarian_min <= policy.libertarian <= self.libertarian_max)\
 			   and (self.progressive_min <= policy.progressive <= self.progressive_max)
 
+	@staticmethod
+	def pick_policy_range_at_random(policy: Policy) -> __class__:
+		"""
+		Selects a policy range at random based on a given policy preference.
 
-def pick_policy_range_at_random(policy: Policy) -> PolicyRange:
-	"""
-	Selects a policy range at random based on a given policy preference.
+		Parameters
+		----------
+		policy : Policy
+			The policy preference.
 
-	TODO: The variance here is arbitrary.
+		Returns
+		-------
+		policy_range : PolicyRange
+			The chosen policy range.
+		"""
 
-	Parameters
-	----------
-	policy : Policy
-		The policy preference.
+		wiggle = 0.2
 
-	Returns
-	-------
-	policy_range : PolicyRange
-		The chosen policy range.
-	"""
+		libertarian_min = max(0.0, policy.libertarian - wiggle * np.random.random())
+		libertarian_max = min(1.0, policy.libertarian + wiggle * np.random.random())
+		progressive_min = max(0.0, policy.progressive - wiggle * np.random.random())
+		progressive_max = min(1.0, policy.progressive + wiggle * np.random.random())
 
-	wiggle = 0.2
-
-	libertarian_min = max(0.0, policy.libertarian - wiggle * np.random.random())
-	libertarian_max = min(1.0, policy.libertarian + wiggle * np.random.random())
-	progressive_min = max(0.0, policy.progressive - wiggle * np.random.random())
-	progressive_max = min(1.0, policy.progressive + wiggle * np.random.random())
-
-	return PolicyRange(libertarian_min, libertarian_max, progressive_min, progressive_max)
+		return PolicyRange(libertarian_min, libertarian_max, progressive_min, progressive_max)

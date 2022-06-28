@@ -1,6 +1,9 @@
 import numpy as np
 
-from party import Party
+from parties import Parties
+from bill import Bill
+
+from typing import List
 
 
 class President:
@@ -8,14 +11,36 @@ class President:
 	The president.
 	"""
 
-	def __init__(self):
+	def __init__(self, party: Parties):
 		"""
 		Initialises the president.
+
+		TODO: Elections are missing.
+
+		Parameters
+		----------
+		party : Party
+			The party of the President.
 		"""
 
-		#
+		self.party: Parties = party
 
-	def vote(self, bill: Bill, t: int) -> Vote:
+	def vote_for_bills(self, bills: List[Bill]):
+		"""
+		The president votes on a bunch of bills.
+
+		Parameters
+		----------
+		bills : List[Bill]
+			A list of bills.
+		"""
+
+		for bill in bills:
+			if self.vote_for_bill(bill):
+				bill.passed_president = True
+				bill.passed = True
+
+	def vote_for_bill(self, bill: Bill) -> bool:
 		"""
 		The president votes on a bill.
 
@@ -23,8 +48,6 @@ class President:
 		----------
 		bill : Bill
 			The bill in question.
-		t : int
-			The current time step.
 
 		Returns
 		-------
@@ -32,27 +55,8 @@ class President:
 			The resulting vote.
 		"""
 
-		# 
-
-
-		# Have all coalitions vote
-		for coalition in self.coalitions:
-			coalition_ids = [r.rep_id for r in coalition.representatives]
-			if bill.policy_range.in_range(coalition.policy_preference_t[t]):
-				yeas.extend(coalition_ids)
-			else:
-				nays.extend(coalition_ids)
-
-		# Have all other representatives vote
-		for representative in self.representatives:
-			if representative.coalition is None:
-				if bill.policy_range.in_range(representative.policy_preference_t[t]):
-					yeas.append(representative.rep_id)
-				else:
-					nays.append(representative.rep_id)
-
-		# Return the results
-		return Vote(self.body, yeas, nays, t)
-
-
-
+		# The president decides at random, but is more likely to vote for a bill, if the sponsor is from their party
+		if self.party == bill.sponsor.party:
+			return np.random.random() > 0.1
+		else:
+			return np.random.random() > 0.9

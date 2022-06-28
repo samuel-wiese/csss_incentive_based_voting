@@ -3,7 +3,7 @@ import numpy as np
 from house_representative import HouseRepresentative
 from senate_representative import SenateRepresentative
 from coalition import Coalition
-from policy_range import PolicyRange, pick_policy_range_at_random
+from policy_range import PolicyRange
 
 from typing import Union
 
@@ -35,7 +35,7 @@ class Bill:
 		self.voting_time: int = t
 
 		# Picks the admissible policy range of the bill at random, based on the policy preference of the sponsor(s)
-		self.policy_range: PolicyRange = pick_policy_range_at_random(self.sponsor.policy_preference_t[t])
+		self.policy_range: PolicyRange = PolicyRange.pick_policy_range_at_random(self.sponsor.policy_preference)
 
 		# The outcome of the bill
 		self.passed_house: bool = False

@@ -1,6 +1,6 @@
 import numpy as np
 
-from party import Party
+from parties import Parties
 from financial_incentive import FinancialIncentive
 
 
@@ -12,8 +12,6 @@ class Incentive:
 	def __init__(self, financial_incentive: FinancialIncentive, ideological: float, party_pressure: float):
 		"""
 		Initialises the incentive structure.
-
-		TODO: removed the "incumbent"-parameter for now, because it would be a dynamic one.
 
 		Parameters
 		----------
@@ -37,38 +35,35 @@ class Incentive:
 		return "Incentive (Fin: " + str(self.financial) + ", IDEO: " + str(self.ideological) + ", PP: "\
 			   + str(self.party_pressure) + ")"
 
+	@staticmethod
+	def pick_incentive_at_random(party: Parties) -> __class__:
+		"""
+		Selects an incentive at random based on the Party.
 
-def pick_incentive_at_random(party: Party) -> Incentive:
-	"""
-	Selects an incentive at random based on the Party.
+		Parameters
+		----------
+		party : Parties
+			The party.
+		Returns
+		-------
+		incentive : Incentive
+			The chosen incentive.
+		"""
 
-	TODO: These are arbitrary.
+		if party == Parties.DEMOCRATIC:
+			financial_incentive = np.random.choice([FinancialIncentive.SMALL_DOLLAR, FinancialIncentive.BIG_DOLLAR],
+												   p=[0.7, 0.3])
+			ideological_incentive = 0.4 + 0.4 * np.random.random()
+			party_pressure = np.random.random()
+		elif party == Parties.REPUBLICAN:
+			financial_incentive = np.random.choice([FinancialIncentive.SMALL_DOLLAR, FinancialIncentive.BIG_DOLLAR],
+												   p=[0.3, 0.7])
+			ideological_incentive = 0.4 + 0.4 * np.random.random()
+			party_pressure = np.random.random()
+		else:
+			financial_incentive = np.random.choice([FinancialIncentive.SMALL_DOLLAR, FinancialIncentive.BIG_DOLLAR],
+												   p=[0.9, 0.1])
+			ideological_incentive = 0.2 * np.random.random()
+			party_pressure = 0.1 * np.random.random()
 
-	Parameters
-	----------
-	party : Party
-		The party.
-
-	Returns
-	-------
-	incentive : Incentive
-		The chosen incentive.
-	"""
-
-	if party == Party.DEMOCRAT:
-		financial_incentive = np.random.choice([FinancialIncentive.SMALL_DOLLAR, FinancialIncentive.BIG_DOLLAR],
-											   p=[0.7, 0.3])
-		ideological_incentive = 0.4 + 0.4 * np.random.random()
-		party_pressure = np.random.random()
-	elif party == Party.REPUBLICAN:
-		financial_incentive = np.random.choice([FinancialIncentive.SMALL_DOLLAR, FinancialIncentive.BIG_DOLLAR],
-											   p=[0.3, 0.7])
-		ideological_incentive = 0.4 + 0.4 * np.random.random()
-		party_pressure = np.random.random()
-	else:
-		financial_incentive = np.random.choice([FinancialIncentive.SMALL_DOLLAR, FinancialIncentive.BIG_DOLLAR],
-											   p=[0.9, 0.1])
-		ideological_incentive = 0.2 * np.random.random()
-		party_pressure = 0.1 * np.random.random()
-
-	return Incentive(financial_incentive, ideological_incentive, party_pressure)
+		return Incentive(financial_incentive, ideological_incentive, party_pressure)

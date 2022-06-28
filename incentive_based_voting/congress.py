@@ -1,15 +1,16 @@
 import numpy as np
 
+from copy import deepcopy
+
 from house import House
 from senate import Senate
-from bill import Bill
-
 from house_representative import HouseRepresentative
 from senate_representative import SenateRepresentative
 from coalition import Coalition
+from bill import Bill
+from party import Party
 
 from typing import List, Union
-from copy import deepcopy
 
 
 class Congress:
@@ -35,6 +36,9 @@ class Congress:
 
 		# Bills by year
 		self.bills_by_year: List[List[Bill]] = []
+
+		# Bills who made it through the Congress in this time step
+		self.bills_successful: List[Bill] = []
 
 	def generate_some_bills(self, n_bills: int, t: int) -> None:
 		"""
@@ -70,12 +74,18 @@ class Congress:
 			bills.append(bill)
 		self.bills_by_year.append(bills)
 
-	def attempt_passing_bills(self, t: int) -> None:
+	def attempt_passing_bills(self, democrats: Party, republicans: Party, otherparty: Party, t: int) -> None:
 		"""
 		Bills are sent through congress.
 
 		Parameters
 		----------
+		democrats : Party
+			The democratic party.
+		republicans : Party
+			The republican party.
+		otherparty : Party
+			The other party.
 		t : int
 			The current time step.
 		"""
@@ -83,7 +93,7 @@ class Congress:
 		# House
 		votes = []
 		for bill in self.bills_by_year[-1]:
-			vote = self.house.vote(bill, t)
+			vote = self.house.vote(bill, democrats, republicans, otherparty, t)
 			bill.passed_house = vote.passed
 			votes.append(vote)
 		self.house.votes_by_year.append(deepcopy(votes))
@@ -92,7 +102,10 @@ class Congress:
 		votes = []
 		for bill in self.bills_by_year[-1]:
 			if bill.passed_house:
-				vote = self.senate.vote(bill, t)
+				vote = self.senate.vote(bill, democrats, republicans, otherparty, t)
 				bill.passed_senate = vote.passed
 				votes.append(vote)
 		self.senate.votes_by_year.append(deepcopy(votes))
+
+		# Remember the bill that have been successful so far
+		self.bills_successful = [bill for bill in self.bills_by_year[-1] if bill.passed_senate]

@@ -1,6 +1,6 @@
 import numpy as np
 
-from party import Party
+from parties import Parties
 
 
 class Policy:
@@ -11,7 +11,6 @@ class Policy:
 	def __init__(self, libertarian: float, progressive: float):
 		"""
 		Initialises a new policy preference.
-
 		Parameters
 		----------
 		libertarian : float
@@ -29,54 +28,48 @@ class Policy:
 		self.progressive = progressive
 		self.conservative = 1.0 - progressive
 
+	@staticmethod
+	def pick_policy_preference_at_random(party: Parties) -> __class__:
+		"""
+		Selects a policy preference at random based on the Party.
 
-def pick_policy_preference_at_random(party: Party) -> Policy:
-	"""
-	Selects a policy preference at random based on the Party.
+		Parameters
+		----------
+		party : Parties
+			The party.
+		Returns
+		-------
+		policy : Policy
+			The chosen policy.
+		"""
 
-	TODO: These are arbitrary.
+		if party == Parties.DEMOCRATIC:
+			libertarian = 0.2 + 0.6 * np.random.random()
+			progressive = 0.7 + 0.2 * np.random.random()
+		elif party == Parties.REPUBLICAN:
+			libertarian = 0.4 + 0.3 * np.random.random()
+			progressive = 0.2 + 0.2 * np.random.random()
+		else:
+			libertarian = np.random.random()
+			progressive = np.random.random()
 
-	Parameters
-	----------
-	party : Party
-		The party.
+		return Policy(libertarian, progressive)
 
-	Returns
-	-------
-	policy : Policy
-		The chosen policy.
-	"""
+	@staticmethod
+	def compute_distance(p1: __class__, p2: __class__) -> float:
+		"""
+		Computes the (Euclidean) distance between two policies.
 
-	if party == Party.DEMOCRAT:
-		libertarian = 0.2 + 0.6 * np.random.random()
-		progressive = 0.7 + 0.2 * np.random.random()
-	elif party == Party.REPUBLICAN:
-		libertarian = 0.4 + 0.3 * np.random.random()
-		progressive = 0.2 + 0.2 * np.random.random()
-	else:
-		libertarian = np.random.random()
-		progressive = np.random.random()
+		Parameters
+		----------
+		p1 : Policy
+			The first policy.
+		p2 : Policy
+			The second policy.
+		Returns
+		-------
+		distance : float
+			The (Euclidean) distance between two policies.
+		"""
 
-	return Policy(libertarian, progressive)
-
-
-def compute_distance(p1: Policy, p2: Policy) -> float:
-	"""
-	Computes the (Euclidean) distance between two policies.
-
-	TODO: Again, somewhat arbitrary.
-
-	Parameters
-	----------
-	p1 : Policy
-		The first policy.
-	p2 : Policy
-		The second policy.
-
-	Returns
-	-------
-	distance : float
-		The (Euclidean) distance between two policies.
-	"""
-
-	return np.sqrt((p1.libertarian - p2.libertarian) ** 2 + (p1.progressive - p2.progressive) ** 2)
+		return np.sqrt((p1.libertarian - p2.libertarian) ** 2 + (p1.progressive - p2.progressive) ** 2)
