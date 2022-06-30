@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from copy import deepcopy
+
 from time_step import TimeStep
 from event import Event
 
@@ -51,7 +53,7 @@ class Timeline:
 			if time.year % 4 == 0:
 				events.append(Event.PRESIDENTIAL_ELECTION)
 
-			self.events[time] = events
+			self.events[deepcopy(time)] = events
 			time.inc()
 
 		# Total number of time steps

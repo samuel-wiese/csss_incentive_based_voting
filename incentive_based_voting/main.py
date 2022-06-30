@@ -29,9 +29,6 @@ otherparty = Party(Parties.OTHER)
 # Initialise the President
 president = President(Parties.DEMOCRATIC)
 
-# TODO: fix the timeline!
-exit()
-
 # Run
 for t, time in enumerate(tqdm(timeline.events)):
 	for event in timeline.events[time]:
