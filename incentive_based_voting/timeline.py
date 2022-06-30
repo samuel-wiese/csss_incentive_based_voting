@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+from time_step import TimeStep
 from event import Event
-from time import Time
 
 from typing import List, Dict
 
@@ -22,10 +24,10 @@ class Timeline:
 		"""
 
 		# Events happening at each time step
-		self.events: Dict[Time, List[Event]] = {}
-		time = Time(start_year)
-		end_time = Time(end_year, 12)
-		while time < end_time:
+		self.events: Dict[TimeStep, List[Event]] = {}
+		time = TimeStep(start_year)
+		end_time = TimeStep(end_year, 12)
+		while time <= end_time:
 
 			# New bills are introduced every month
 			events: List[Event] = [Event.NEW_LEGISLATURE]
@@ -50,6 +52,7 @@ class Timeline:
 				events.append(Event.PRESIDENTIAL_ELECTION)
 
 			self.events[time] = events
+			time.inc()
 
 		# Total number of time steps
 		self.t_max = len(self.events.keys())

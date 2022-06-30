@@ -1,7 +1,7 @@
 from typing import Optional
 
 
-class Time:
+class TimeStep:
 	"""
 	Representation of time in the model.
 	"""

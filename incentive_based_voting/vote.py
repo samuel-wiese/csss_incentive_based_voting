@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from voting_bodies import VotingBodies
 
 from typing import List

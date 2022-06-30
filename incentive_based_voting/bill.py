@@ -1,11 +1,14 @@
+from __future__ import annotations
+
 import numpy as np
 
-from house_representative import HouseRepresentative
-from senate_representative import SenateRepresentative
-from coalition import Coalition
 from policy_range import PolicyRange
 
-from typing import Union
+from typing import Union, TYPE_CHECKING
+if TYPE_CHECKING:
+	from house_representative import HouseRepresentative
+	from senate_representative import SenateRepresentative
+	from coalition import Coalition
 
 
 class Bill:

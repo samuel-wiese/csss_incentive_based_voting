@@ -1,8 +1,13 @@
+from __future__ import annotations
+
 from voting_body import VotingBody
-from bill import Bill
-from vote import Vote
-from party import Party
 from voting_bodies import VotingBodies
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+	from bill import Bill
+	from vote import Vote
+	from party import Party
 
 
 class House(VotingBody):

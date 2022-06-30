@@ -1,16 +1,19 @@
+from __future__ import annotations
+
 import numpy as np
 
 from copy import deepcopy
 
 from house import House
 from senate import Senate
-from house_representative import HouseRepresentative
-from senate_representative import SenateRepresentative
-from coalition import Coalition
 from bill import Bill
-from party import Party
 
-from typing import List, Union
+from typing import List, Union, TYPE_CHECKING
+if TYPE_CHECKING:
+	from house_representative import HouseRepresentative
+	from senate_representative import SenateRepresentative
+	from coalition import Coalition
+	from party import Party
 
 
 class Congress:
@@ -60,12 +63,14 @@ class Congress:
 			if sponsor_id < len(self.house.representatives):
 				sponsors.append(self.house.representatives[sponsor_id])
 			elif sponsor_id < len(self.house.representatives) + len(self.house.coalitions):
-				sponsors.append(self.house.coalitions[sponsor_id])
+				sponsors.append(self.house.coalitions[sponsor_id - len(self.house.representatives)])
 			elif sponsor_id < len(self.house.representatives) + len(self.house.coalitions)\
 					+ len(self.senate.representatives):
-				sponsors.append(self.senate.representatives[sponsor_id])
+				sponsors.append(self.senate.representatives[sponsor_id - len(self.house.representatives)
+															- len(self.house.coalitions)])
 			else:
-				sponsors.append(self.senate.coalitions[sponsor_id])
+				sponsors.append(self.senate.coalitions[sponsor_id - len(self.house.representatives)
+													   - len(self.house.coalitions) - len(self.senate.representatives)])
 
 		# Generates corresponding bills
 		bills = []

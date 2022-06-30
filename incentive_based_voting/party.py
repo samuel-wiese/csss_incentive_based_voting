@@ -1,9 +1,12 @@
-from parties import Parties
-from policy import Policy
-from house_representative import HouseRepresentative
-from senate_representative import SenateRepresentative
+from __future__ import annotations
 
-from typing import List
+from policy import Policy
+
+from typing import List, TYPE_CHECKING
+if TYPE_CHECKING:
+	from parties import Parties
+	from house_representative import HouseRepresentative
+	from senate_representative import SenateRepresentative
 
 
 class Party:

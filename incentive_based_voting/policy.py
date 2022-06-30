@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import numpy as np
 
 from parties import Parties
@@ -11,6 +13,7 @@ class Policy:
 	def __init__(self, libertarian: float, progressive: float):
 		"""
 		Initialises a new policy preference.
+
 		Parameters
 		----------
 		libertarian : float
@@ -29,7 +32,7 @@ class Policy:
 		self.conservative = 1.0 - progressive
 
 	@staticmethod
-	def pick_policy_preference_at_random(party: Parties) -> __class__:
+	def pick_policy_preference_at_random(party: Parties) -> Policy:
 		"""
 		Selects a policy preference at random based on the Party.
 

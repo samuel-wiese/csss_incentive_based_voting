@@ -1,7 +1,13 @@
+from __future__ import annotations
+
 from voting_body import VotingBody
-from bill import Bill
-from vote import Vote
-from party import Party
+from voting_bodies import VotingBodies
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+	from bill import Bill
+	from vote import Vote
+	from party import Party
 
 
 class Senate(VotingBody):
@@ -21,7 +27,7 @@ class Senate(VotingBody):
 			The number of years we are running the simulation for.
 		"""
 
-		super().__init__(year, t_max, "senate")
+		super().__init__(year, t_max, VotingBodies.SENATE)
 
 	def vote(self, bill: Bill, democrats: Party, republicans: Party, otherparty: Party, t: int) -> Vote:
 		"""

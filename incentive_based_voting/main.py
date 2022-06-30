@@ -1,3 +1,5 @@
+from tqdm import tqdm
+
 from congress import Congress
 from timeline import Timeline
 from event import Event
@@ -11,7 +13,7 @@ from voting_bodies import VotingBodies
 # Settings
 start_year = 2010
 end_year = 2020
-n_bills = 500  # the number of bills that are brought before congress each month
+n_bills = 10  # the number of bills that are brought before congress each month
 
 # Create a timeline
 timeline = Timeline(start_year, end_year)
@@ -27,8 +29,11 @@ otherparty = Party(Parties.OTHER)
 # Initialise the President
 president = President(Parties.DEMOCRATIC)
 
+# TODO: fix the timeline!
+exit()
+
 # Run
-for t, time in enumerate(timeline.events):
+for t, time in enumerate(tqdm(timeline.events)):
 	for event in timeline.events[time]:
 
 		# New bills are being voted on every month

@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import numpy as np
 
-from parties import Parties
-from bill import Bill
-
-from typing import List
+from typing import List, TYPE_CHECKING
+if TYPE_CHECKING:
+	from parties import Parties
+	from bill import Bill
 
 
 class President:

@@ -1,17 +1,20 @@
+from __future__ import annotations
+
 import numpy as np
 import csv
 import os
 
-from coalition import Coalition
+from voting_bodies import VotingBodies
+from parties import Parties
 from house_representative import HouseRepresentative
 from senate_representative import SenateRepresentative
-from party import Party
-from parties import Parties
-from bill import Bill
 from vote import Vote
-from voting_bodies import VotingBodies
 
-from typing import List
+from typing import List, TYPE_CHECKING
+if TYPE_CHECKING:
+	from coalition import Coalition
+	from party import Party
+	from bill import Bill
 
 
 class VotingBody:
@@ -53,7 +56,7 @@ class VotingBody:
 
 		# Take data and create new representatives
 		senate_data = []
-		f = open(os.path.dirname(__file__) + "/data/" + desc + ".csv", "r")
+		f = open(os.path.dirname(__file__) + "/data/" + desc + ".csv", "r", encoding='Latin1')
 		for line in csv.reader(f, quotechar='"', delimiter=',', quoting=csv.QUOTE_ALL, skipinitialspace=True):
 			senate_data.append(line)
 		senate_data = np.array(senate_data)

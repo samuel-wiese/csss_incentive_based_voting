@@ -1,6 +1,10 @@
+from __future__ import annotations
+
 import numpy as np
 
-from policy import Policy
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+	from policy import Policy
 
 
 class PolicyRange:

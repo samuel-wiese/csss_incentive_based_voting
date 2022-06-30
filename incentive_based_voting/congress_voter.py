@@ -1,14 +1,17 @@
+from __future__ import annotations
+
 import numpy as np
 
-from party import Party
+from financial_incentive import FinancialIncentive
 from parties import Parties
 from voting_bodies import VotingBodies
-from incentive import Incentive
-from financial_incentive import FinancialIncentive
-from bill import Bill
-from policy import Policy
 
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+	from party import Party
+	from incentive import Incentive
+	from bill import Bill
+	from policy import Policy
 
 
 class CongressVoter:

@@ -1,6 +1,11 @@
+from __future__ import annotations
+
 from representative import Representative
-from parties import Parties
 from voting_bodies import VotingBodies
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+	from parties import Parties
 
 
 class HouseRepresentative(Representative):

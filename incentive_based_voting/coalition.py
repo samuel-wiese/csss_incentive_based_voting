@@ -1,15 +1,18 @@
+from __future__ import annotations
+
 import numpy as np
 
 from congress_voter import CongressVoter
-from representative import Representative
-from incentive import Incentive
-from financial_incentive import FinancialIncentive
 from policy import Policy
-from bill import Bill
-from party import Party
-from voting_bodies import VotingBodies
+from financial_incentive import FinancialIncentive
+from incentive import Incentive
 
-from typing import List
+from typing import List, TYPE_CHECKING
+if TYPE_CHECKING:
+	from representative import Representative
+	from bill import Bill
+	from party import Party
+	from voting_bodies import VotingBodies
 
 
 class Coalition(CongressVoter):
@@ -156,6 +159,8 @@ class Coalition(CongressVoter):
 		# Representatives may join existing coalitions
 		representatives_who_recently_joined = []
 		for representative in representatives:
+			if len(coalitions) == 0:
+				break
 
 			# Find the closest coalition
 			closest_coalition = None
@@ -183,6 +188,8 @@ class Coalition(CongressVoter):
 
 		# Representatives may decide to leave existing coalitions
 		for representative in representatives:
+			if len(coalitions) == 0:
+				break
 			if representative.coalition is None or representative in representatives_who_recently_joined:
 				continue
 
