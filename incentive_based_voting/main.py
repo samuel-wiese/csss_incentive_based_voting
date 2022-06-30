@@ -12,7 +12,7 @@ from voting_bodies import VotingBodies
 
 # Settings
 start_year = 2010
-end_year = 2020
+end_year = 2010
 n_bills = 10  # the number of bills that are brought before congress each month
 
 # Create a timeline
@@ -33,13 +33,19 @@ president = President(Parties.DEMOCRATIC)
 for t, time in enumerate(tqdm(timeline.events)):
 	for event in timeline.events[time]:
 
+		# Representatives age and gain political influence every month
+		if event == Event.AGING and t > 0:
+			congress.aging(t)
+
+			print([r.party_importance_t[t] for r in congress.house.representatives])
+
 		# New bills are being voted on every month
-		if event == Event.NEW_LEGISLATURE:
+		elif event == Event.NEW_LEGISLATURE:
 
 			# Update party policy preferences
-			democrats.update_policy_preference(congress.house.representatives, congress.senate.representatives, t=0)
-			republicans.update_policy_preference(congress.house.representatives, congress.senate.representatives, t=0)
-			otherparty.update_policy_preference(congress.house.representatives, congress.senate.representatives, t=0)
+			democrats.update_policy_preference(congress.house.representatives, congress.senate.representatives, t)
+			republicans.update_policy_preference(congress.house.representatives, congress.senate.representatives, t)
+			otherparty.update_policy_preference(congress.house.representatives, congress.senate.representatives, t)
 
 			# Create a few new bills and try to pass them
 			congress.generate_some_bills(n_bills, t)
@@ -49,30 +55,31 @@ for t, time in enumerate(tqdm(timeline.events)):
 			president.vote_for_bills(congress.bills_successful)
 
 		# New poll results come out every 3 months
-		if event == Event.NEW_POLLS:
+		elif event == Event.NEW_POLLS:
 			# TODO: either use data or do scenario generation
 			pass
 
 		# New coalition formation occurs every month
-		if event == Event.OPINION_FORMATION:
+		elif event == Event.OPINION_FORMATION:
 			Coalition.coalition_formation(congress.house.representatives, congress.house.coalitions,
 										  congress.house.broken_coalitions, VotingBodies.HOUSE, t, timeline.t_max)
 			Coalition.coalition_formation(congress.senate.representatives, congress.senate.coalitions,
 										  congress.senate.broken_coalitions, VotingBodies.SENATE, t, timeline.t_max)
 
 		# Elections in the House happen every 2 years
-		if event == Event.HOUSE_ELECTION:
+		elif event == Event.HOUSE_ELECTION:
 			# TODO: nice for scenario generation, but ignore for now
 			pass
 
 		# Elections in the Senate happen every 6 years
-		if event == Event.SENATE_ELECTION:
+		elif event == Event.SENATE_ELECTION:
 			# TODO: nice for scenario generation, but ignore for now
 			pass
 
 		# Presidential elections happen every 4 years
-		if event == Event.PRESIDENTIAL_ELECTION:
+		elif event == Event.PRESIDENTIAL_ELECTION:
 			# TODO: nice for scenario generation, but ignore for now
 			pass
+
 
 print("Done!")

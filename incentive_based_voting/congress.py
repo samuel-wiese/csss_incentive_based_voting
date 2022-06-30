@@ -114,3 +114,27 @@ class Congress:
 
 		# Remember the bill that have been successful so far
 		self.bills_successful = [bill for bill in self.bills_by_year[-1] if bill.passed_senate]
+
+	def aging(self, t: int) -> None:
+		"""
+		Representatives age and gain political influence.
+
+		Parameters
+		----------
+		t : int
+			The current time step.
+		"""
+
+		# For the House
+		for r in self.house.representatives:
+			r.party_importance_t[t] = (t + 1) ** 0.5 * r.party_importance_t[0]
+		for c in self.house.coalitions:
+			c.compute_party_importance(t)
+			c.compute_policy_preference(t)
+
+		# For the Senate
+		for r in self.senate.representatives:
+			r.party_importance_t[t] = (t + 1) ** 0.5 * r.party_importance_t[0]
+		for c in self.senate.coalitions:
+			c.compute_party_importance(t)
+			c.compute_policy_preference(t)

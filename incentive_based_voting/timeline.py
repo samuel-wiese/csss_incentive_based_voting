@@ -31,9 +31,9 @@ class Timeline:
 		end_time = TimeStep(end_year, 12)
 		while time <= end_time:
 
-			# New bills are introduced every month
-			events: List[Event] = [Event.NEW_LEGISLATURE]
-	
+			# Representatives age every month, new bills are introduced every month
+			events: List[Event] = [Event.AGING, Event.NEW_LEGISLATURE]
+
 			# New poll results come every 3 months
 			if time.month % 3 == 0:
 				events.append(Event.NEW_POLLS)
