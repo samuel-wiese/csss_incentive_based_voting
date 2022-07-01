@@ -31,8 +31,8 @@ otherparty = Party(Parties.OTHER)
 president = President(Parties.DEMOCRATIC)
 
 # For keeping track and for drawing
-graph_house = create_network(congress.house.coalitions, congress.house.representatives)
-graph_senate = create_network(congress.senate.coalitions, congress.senate.representatives)
+graph_house = create_network(congress.house.representatives)
+graph_senate = create_network(congress.senate.representatives)
 
 # Draw initial networks
 draw_network(graph_house, t=0)
@@ -93,8 +93,8 @@ for t, time in enumerate(tqdm(timeline.events)):
 			pass
 
 		# Update the network
-		graph_house = create_network(congress.house.coalitions, congress.house.representatives)
-		graph_senate = create_network(congress.senate.coalitions, congress.senate.representatives)
+		graph_house = create_network(congress.house.representatives)
+		graph_senate = create_network(congress.senate.representatives)
 
 		# Draw networks
 		draw_network(graph_house, t+1)

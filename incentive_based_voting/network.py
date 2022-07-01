@@ -3,12 +3,12 @@ import matplotlib.pyplot as plt
 
 from congress_voter import CongressVoter
 from coalition import Coalition
+from representative import Representative
 
 from typing import List
 
 
-def create_network(coalitions: List[Coalition],
-                   representatives: List[CongressVoter]) -> nx.Graph:
+def create_network(representatives: List[Representative]) -> nx.Graph:
     """
     Draws a new network to include what happened in the current time step.
 
@@ -16,8 +16,6 @@ def create_network(coalitions: List[Coalition],
     ----------
     graph : nx.Graph
         Our graph.
-    coalitions : List[Coalition]
-        The set of current coalitions.
     representatives : List[CongressVoter]
         The set of all.
     """
@@ -25,24 +23,13 @@ def create_network(coalitions: List[Coalition],
     # Plot nodes and edges for representatives in coalitions
     graph = nx.Graph()
 
-    for i, coalition in enumerate(coalitions):
-        for j, representative in enumerate(coalition.representatives):
-            graph.add_node(representative.id, pos=(representative.policy_preference.libertarian,
-                                                   representative.policy_preference.progressive))
-        for j1, representative1 in enumerate(coalition.representatives):
-            for j2, representative2 in enumerate(coalition.representatives):
-                if j1 != j2:
+    for i1, representative1 in enumerate(representatives):
+        graph.add_node(representative1.id, pos=(representative1.policy_preference.libertarian,
+                                                representative1.policy_preference.progressive))
+        if representative1.coalition is not None:
+            for i2, representative2 in enumerate(representative1.coalition.representatives):
+                if ~graph.has_edge(representative2.id, representative1.id):
                     graph.add_edge(representative1.id, representative2.id)
-
-    representatives_in_coalitions = [coalition.representatives for coalition in coalitions]
-    representatives_in_coalitions = [representative for representatives in representatives_in_coalitions
-                                     for representative in representatives]
-
-    # Plot nodes without edges for representatives not in coalitions
-    for i, representative in enumerate(representatives):
-        if representative not in representatives_in_coalitions:
-            graph.add_node(representative.id, pos=(representative.policy_preference.libertarian,
-                                                   representative.policy_preference.progressive))
 
     return graph
 
