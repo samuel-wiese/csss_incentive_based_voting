@@ -10,7 +10,7 @@ from typing import List
 
 def create_network(representatives: List[Representative]) -> nx.Graph:
     """
-    Draws a new network to include what happened in the current time step.
+    Creates a new network for the current time step.
 
     Parameters
     ----------
@@ -20,12 +20,15 @@ def create_network(representatives: List[Representative]) -> nx.Graph:
         The set of all.
     """
 
-    # Plot nodes and edges for representatives in coalitions
+    # Initialise graph
     graph = nx.Graph()
 
+    # Create nodes for all representatives (to update their position in the 2d policy space)
     for i1, representative1 in enumerate(representatives):
         graph.add_node(representative1.id, pos=(representative1.policy_preference.libertarian,
                                                 representative1.policy_preference.progressive))
+
+        # Add edges to representatives in coalition
         if representative1.coalition is not None:
             for i2, representative2 in enumerate(representative1.coalition.representatives):
                 if ~graph.has_edge(representative2.id, representative1.id):
