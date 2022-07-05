@@ -151,11 +151,11 @@ class VotingBody:
 													  0, self.t_max)
 				self.representatives.append(representative)
 			for i in range(41):
-				representative = SenateRepresentative("SR_0_" + str(i + 1), "XX", "person", Parties.REPUBLICAN,
+				representative = SenateRepresentative("SR_0_" + str(i + 58), "XX", "person", Parties.REPUBLICAN,
 													  0, self.t_max)
 				self.representatives.append(representative)
 			for i in range(2):
-				representative = SenateRepresentative("SR_0_" + str(i + 1), "XX", "person", Parties.OTHER,
+				representative = SenateRepresentative("SR_0_" + str(i + 99), "XX", "person", Parties.OTHER,
 													  0, self.t_max)
 				self.representatives.append(representative)
 

@@ -186,7 +186,7 @@ class Coalition(CongressVoter):
 			# An agent is more likely to join a coalition if they are less powerful, if the coalition is more powerful, or
 			# if the coalition is closer to them
 			if closest_coalition_dist\
-					< 0.01 * closest_coalition.party_importance_t[t] / representative.party_importance_t[t]\
+					< 0.05 * closest_coalition.party_importance_t[t] / representative.party_importance_t[t]\
 					and representative.incentive.financial == closest_coalition.incentive.financial:
 				representative.coalition = closest_coalition
 				closest_coalition.representatives.append(representative)
@@ -213,7 +213,7 @@ class Coalition(CongressVoter):
 			# TODO: the inequality needs to be normalised
 			policy_dist = Policy.compute_distance(representative.policy_preference,
 												  representative.coalition.policy_preference)
-			if policy_dist > 0.05 * representative.coalition.party_importance_t[t]\
+			if policy_dist > 0.1 * representative.coalition.party_importance_t[t]\
 					/ representative.party_importance_t[t]:
 				representative.coalition.representatives.remove(representative)
 
