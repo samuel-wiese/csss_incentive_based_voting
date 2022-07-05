@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 	from bill import Bill
 	from party import Party
 	from voting_bodies import VotingBodies
+	from parties import Parties
 
 
 class Coalition(CongressVoter):
@@ -43,6 +44,9 @@ class Coalition(CongressVoter):
 
 		# The initial representatives that are part of the coalition
 		self.representatives: List[Representative] = created_from
+
+		# The corresponding party
+		self.party: Parties = self.representatives[0].party
 
 		# Set the initial policy preference
 		self.policy_preference = self.compute_policy_preference(t)
@@ -136,7 +140,8 @@ class Coalition(CongressVoter):
 
 	@staticmethod
 	def coalition_formation(representatives: List[Representative], coalitions: List[__class__],
-							broken_coalitions: List[__class__], voting_body: VotingBodies, t: int, t_max: int) -> None:
+							broken_coalitions: List[__class__], voting_body: VotingBodies, t: int, t_max: int)\
+			-> List[__class__]:
 		"""
 		Performs coalition formation in the House or the Senate.
 
@@ -154,6 +159,11 @@ class Coalition(CongressVoter):
 			Current time step.
 		t_max : int
 			The total number of time steps.
+
+		Returns
+		-------
+		new_coalitions : List[Coalition]
+			The new list of coalitions.
 		"""
 
 		# Representatives may join existing coalitions
@@ -166,6 +176,8 @@ class Coalition(CongressVoter):
 			closest_coalition = None
 			closest_coalition_dist = np.inf
 			for coalition in coalitions:
+				if coalition.party != representative.party:
+					continue
 				policy_dist = Policy.compute_distance(representative.policy_preference, coalition.policy_preference)
 				if closest_coalition_dist > policy_dist:
 					closest_coalition = coalition
@@ -173,8 +185,9 @@ class Coalition(CongressVoter):
 
 			# An agent is more likely to join a coalition if they are less powerful, if the coalition is more powerful, or
 			# if the coalition is closer to them
-			# TODO: Really fucking arbitrary inequality.
-			if closest_coalition_dist < closest_coalition.party_importance_t[t] / representative.party_importance_t[t]:
+			if closest_coalition_dist\
+					< 0.01 * closest_coalition.party_importance_t[t] / representative.party_importance_t[t]\
+					and representative.incentive.financial == closest_coalition.incentive.financial:
 				representative.coalition = closest_coalition
 				closest_coalition.representatives.append(representative)
 
@@ -196,29 +209,38 @@ class Coalition(CongressVoter):
 			# Similar rules as before -- we are more likely to leave if the coalition doesn't represent us anymore and if we
 			# don't depend on it
 			# TODO: Should take the positions and strength of other existing coalitions into account
+			# TODO: might want to include incentives here, in particular financial ones
+			# TODO: the inequality needs to be normalised
 			policy_dist = Policy.compute_distance(representative.policy_preference,
 												  representative.coalition.policy_preference)
-			if policy_dist > representative.coalition.party_importance_t[t] / representative.party_importance_t[t]:
+			if policy_dist > 0.05 * representative.coalition.party_importance_t[t]\
+					/ representative.party_importance_t[t]:
 				representative.coalition.representatives.remove(representative)
 
 				# Re-compute policy-preference and importance of the coalition
-				representative.coalition.policy_preference = representative.coalition.compute_policy_preference(t)
-				representative.coalition.party_importance_t[t] = representative.coalition.compute_party_importance(t)
-				representative.coalition.incentive = representative.coalition.compute_incentives()
+				if len(representative.coalition.representatives) > 0:
+					representative.coalition.policy_preference = representative.coalition.compute_policy_preference(t)
+					representative.coalition.party_importance_t[t]\
+						= representative.coalition.compute_party_importance(t)
+					representative.coalition.incentive = representative.coalition.compute_incentives()
 
 				representative.coalition = None
 
-		# A coalition with only one existing member falls apart
-		for coalition in coalitions:
-			if len(coalition.representatives) == 1:
-				coalition.representatives[0].coalition = None
+		# A coalition with only one or no existing members falls apart
+		del_coalitions = []
+		for i, coalition in enumerate(coalitions):
+			if len(coalition.representatives) <= 1:
+				if len(coalition.representatives) == 1:
+					coalition.representatives[0].coalition = None
 				broken_coalitions.append(coalition)
-				coalitions.remove(coalition)
+				del_coalitions.append(i)
+		coalitions = [coalitions[i] for i in range(len(coalitions)) if i not in del_coalitions]
 
 		# Representatives may decide to form a new coalition; first, look for the pairwise closest representatives
 		closest_representatives = []
 		for representative1 in representatives:
 			if representative1.coalition is not None:
+				closest_representatives.append(None)
 				continue
 
 			# Each representative looks for the representative closest to them
@@ -226,6 +248,8 @@ class Coalition(CongressVoter):
 			closest_representative_dist = np.inf
 			for representative2 in representatives:
 				if representative2.coalition is not None or representative1 == representative2:
+					continue
+				if representative1.party != representative2.party:
 					continue
 				policy_dist = Policy.compute_distance(representative1.policy_preference, representative2.policy_preference)
 				if closest_representative_dist > policy_dist:
@@ -238,7 +262,8 @@ class Coalition(CongressVoter):
 		for i, representative1 in enumerate(representatives):
 			matched_representative = None
 			for j, representative2 in enumerate(representatives):
-				if (closest_representatives[i] is not None and closest_representatives[i].id == representative2.id
+				if (closest_representatives[i] is not None and closest_representatives[j] is not None
+						and closest_representatives[i].id == representative2.id
 						and closest_representatives[j].id == representative1.id and i < j):
 					matched_representative = representative2
 					break
@@ -250,3 +275,9 @@ class Coalition(CongressVoter):
 									  [representative1, matched_representative], voting_body, t, t_max)
 			coalitions.append(new_coalition)
 			coalition_counter += 1
+
+			# Update the representatives
+			representative1.coalition = new_coalition
+			matched_representative.coalition = new_coalition
+
+		return coalitions

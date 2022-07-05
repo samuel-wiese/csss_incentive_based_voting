@@ -8,13 +8,12 @@ from president import President
 from party import Party
 from parties import Parties
 from voting_bodies import VotingBodies
-from network import create_network, draw_network
 
 
 # Settings
 start_year = 2010
 end_year = 2010
-n_bills = 10  # the number of bills that are brought before congress each month
+n_bills = 100  # the number of bills that are brought before congress each month
 
 # Create a timeline
 timeline = Timeline(start_year, end_year)
@@ -30,17 +29,9 @@ otherparty = Party(Parties.OTHER)
 # Initialise the President
 president = President(Parties.DEMOCRATIC)
 
-# For keeping track and for drawing
-graph_house = create_network(congress.house.representatives)
-graph_senate = create_network(congress.senate.representatives)
-
-# Draw initial networks
-draw_network(graph_house, t=0)
-draw_network(graph_senate, t=0)
-
 # Run
-for t, time in enumerate(tqdm(timeline.events)):
-	for event in timeline.events[time]:
+for t, time_step in enumerate(tqdm(timeline.events)):
+	for event in timeline.events[time_step]:
 
 		# Representatives age and gain political influence every month
 		if event == Event.AGING and t > 0:
@@ -68,14 +59,14 @@ for t, time in enumerate(tqdm(timeline.events)):
 
 		# New coalition formation occurs every month
 		elif event == Event.OPINION_FORMATION:
-			Coalition.coalition_formation(congress.house.representatives,
-										  congress.house.coalitions,
-										  congress.house.broken_coalitions,
-										  VotingBodies.HOUSE, t, timeline.t_max)
-			Coalition.coalition_formation(congress.senate.representatives,
-										  congress.senate.coalitions,
-										  congress.senate.broken_coalitions,
-										  VotingBodies.SENATE, t, timeline.t_max)
+			congress.house.coalitions = Coalition.coalition_formation(congress.house.representatives,
+																	  congress.house.coalitions,
+																	  congress.house.broken_coalitions,
+																	  VotingBodies.HOUSE, t, timeline.t_max)
+			congress.senate.coalitions = Coalition.coalition_formation(congress.senate.representatives,
+																	   congress.senate.coalitions,
+																	   congress.senate.broken_coalitions,
+																	   VotingBodies.SENATE, t, timeline.t_max)
 
 		# Elections in the House happen every 2 years
 		elif event == Event.HOUSE_ELECTION:
@@ -92,12 +83,8 @@ for t, time in enumerate(tqdm(timeline.events)):
 			# TODO: nice for scenario generation, but ignore for now
 			pass
 
-		# Update the network
-		graph_house = create_network(congress.house.representatives)
-		graph_senate = create_network(congress.senate.representatives)
-
-		# Draw networks
-		draw_network(graph_house, t+1)
-		draw_network(graph_senate, t+1)
+# Draw the network of House and Senate representatives
+congress.senate.plot_network()
+congress.house.plot_network()
 
 print("Done!")
