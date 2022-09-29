@@ -64,4 +64,4 @@ def draw_network(graph: nx.Graph) -> None:
 
 	pos = nx.get_node_attributes(graph, 'pos')
 	nx.draw(graph, pos, node_size=20)
-	plt.savefig("network.pdf", dpi=300, tight_layout=True)
+	plt.savefig("network.jpg", dpi=300, tight_layout=True)

@@ -27,7 +27,7 @@ class Voter(Agent):
 		super().__init__(id_, "voter", [self])
 
 		# Choose a policy preference at random
-		self.policy_preference = int(id_)
+		self.policy_preference = np.random.random(1)[0]
 
 	def find_closest_agent(self, agents: List[Union[__class__, Coalition]]) -> Union[__class__, Coalition]:
 		"""
